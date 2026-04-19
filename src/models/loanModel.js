@@ -41,5 +41,43 @@ export const LoanModel = {
     `;
     const result = await pool.query(query);
     return result.rows;
+  },
+
+  async returnLoan(loan_id) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN'); // Mulai transaksi database
+
+      // 1. Cek status peminjaman agar sesuai dan mengambil book_id
+      const loanCheck = await client.query('SELECT book_id, status FROM loans WHERE id = $1', [loan_id]);
+      if (loanCheck.rows.length === 0) {
+        throw new Error('Data peminjaman tidak ditemukan.');
+      }
+      if (loanCheck.rows[0].status === 'RETURNED') {
+        throw new Error('Buku sudah dikembalikan sebelumnya.');
+      }
+
+      const book_id = loanCheck.rows[0].book_id;
+
+      // 2. Ubah status menjadi RETURNED dan update return_date
+      const updateLoanSql = `
+        UPDATE loans 
+        SET status = 'RETURNED', return_date = CURRENT_DATE 
+        WHERE id = $1 
+        RETURNING *
+      `;
+      const result = await client.query(updateLoanSql, [loan_id]);
+
+      // 3. Tambah kembali (+1) stok buku
+      await client.query('UPDATE books SET available_copies = available_copies + 1 WHERE id = $1', [book_id]);
+
+      await client.query('COMMIT'); // Simpan semua perubahan (1 Transaksi sukses)
+      return result.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK'); // Batalkan semua jika ada error
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 };
