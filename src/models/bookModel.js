@@ -16,7 +16,7 @@ export const BookModel = {
       values.push(`%${title}%`);
     }
 
-    const result = await pool.query(query);
+    const result = await pool.query(query, values);
     return result.rows;
   },
 
