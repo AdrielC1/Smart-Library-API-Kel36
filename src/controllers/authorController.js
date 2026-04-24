@@ -49,7 +49,7 @@ export const AuthorController = {
 
       res.json({
         message: "Penulis berhasil diperbarui",
-        data: updatedBook
+        data: updatedAuthor
       });
     } catch (err) {
       res.status(400).json({ error: err.message });
