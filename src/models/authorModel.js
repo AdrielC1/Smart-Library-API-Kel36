@@ -1,8 +1,15 @@
 import { pool } from '../config/db.js';
 
 export const AuthorModel = {
-  async getAll() {
-    const result = await pool.query('SELECT * FROM authors ORDER BY name ASC');
+  async getAll(name) {
+    let query = 'SELECT * FROM authors';
+    const values = [];
+    if (name) {
+      query += ' WHERE name ILIKE $1';
+      values.push(`%${name}%`);
+    }
+    query += ' ORDER BY name ASC';
+    const result = await pool.query(query, values);
     return result.rows;
   },
   async create(name, nationality) {

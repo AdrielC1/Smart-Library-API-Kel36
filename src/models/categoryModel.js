@@ -1,8 +1,15 @@
 import { pool } from '../config/db.js';
 
 export const CategoryModel = {
-  async getAll() {
-    const result = await pool.query('SELECT * FROM categories ORDER BY name ASC');
+  async getAll(name) {
+    let query = 'SELECT * FROM categories';
+    const values = [];
+    if (name) {
+      query += ' WHERE name ILIKE $1';
+      values.push(`%${name}%`);
+    }
+    query += ' ORDER BY name ASC';
+    const result = await pool.query(query, values);
     return result.rows;
   },
   async create(name) {

@@ -4,7 +4,7 @@ export const BookController = {
   async getAllBooks(req, res) {
     try {
       const { title } = req.query;
-      const books = await BookModel.getAll();
+      const books = await BookModel.getAll(title);
       res.json(books);
     } catch (err) {
       res.status(500).json({ error: err.message });
