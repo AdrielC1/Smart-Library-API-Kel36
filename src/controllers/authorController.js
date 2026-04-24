@@ -3,8 +3,13 @@ import { AuthorModel } from '../models/authorModel.js';
 export const AuthorController = {
   async getAuthors(req, res) {
     try {
-      const { name } = req.query;
+      const name = req.query.name || Object.keys(req.query)[0];
       const authors = await AuthorModel.getAll(name);
+
+      if (authors.length === 0) {
+        return res.status(404).json({ message: "Data tidak ditemukan" });
+      }
+
       res.json(authors);
     } catch (err) {
       res.status(500).json({ error: err.message });
