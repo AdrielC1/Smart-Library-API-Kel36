@@ -3,6 +3,7 @@ import { BookModel } from '../models/bookModel.js';
 export const BookController = {
   async getAllBooks(req, res) {
     try {
+      const { title } = req.query;
       const books = await BookModel.getAll();
       res.json(books);
     } catch (err) {
