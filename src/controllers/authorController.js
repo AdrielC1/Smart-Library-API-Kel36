@@ -24,5 +24,35 @@ export const AuthorController = {
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
+  },
+
+  async deleteAuthor(req, res) {
+    try {
+      const { id } = req.params;
+
+      const result = await AuthorModel.delete(id);
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  async updateAuthor(req, res) {
+    try {
+      const { id } = req.params;
+      const updatedAuthor = await AuthorModel.update(id, req.body);
+
+      if (!updatedAuthor) {
+        return res.status(404).json({ error: "Penulis tidak ditemukan" });
+      }
+
+      res.json({
+        message: "Penulis berhasil diperbarui",
+        data: updatedBook
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
   }
 };

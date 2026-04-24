@@ -22,5 +22,35 @@ export const CategoryController = {
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
+  },
+
+  async deleteCategory(req, res) {
+    try {
+      const { id } = req.params;
+
+      const result = await CategoryModel.delete(id);
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+
+  async updateCategory(req, res) {
+    try {
+      const { id } = req.params;
+      const updatedCategory = await CategoryModel.update(id, req.body);
+
+      if (!updatedCategory) {
+        return res.status(404).json({ error: "Kategori tidak ditemukan" });
+      }
+
+      res.json({
+        message: "Kategori berhasil diperbarui",
+        data: updatedCategory
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
   }
 };
